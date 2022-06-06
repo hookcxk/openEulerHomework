@@ -3,11 +3,36 @@ import random
 import subprocess
 import traceback
 import shutil
+import glob
+import re
 
 from omniimager import utils
 from omniimager.log_utils import LogUtils
 from omniimager.utils import format_path
 
+EFI_GRUB_FILE="/EFI/BOOT/grub.cfg"
+LEGACY_GRUB_FILE="/isolinux/isolinux.cfg"
+
+def _add_ks(grub_file, kword):
+    with open(grub_file, "r") as f:
+        file_read = f.read()
+    re_search = re.search(kword+'.*', file_read)
+    if re_search:
+        re_sub = re.sub(re_search.group(), re_search.group()+" ks=cdrom:/ks/ks.cfg", file_read)
+        with open(grub_file, "w") as f1:
+            f1.write(re_sub)
+
+def add_ks_para(work_dir):
+    efi_grub = glob.glob(work_dir + EFI_GRUB_FILE)
+    efi_grub = efi_grub[0] if efi_grub else ""
+    isolinux_file = file_glob_isolinux = glob.glob(work_dir + LEGACY_GRUB_FILE)
+    isolinux_file = isolinux_file[0] if isolinux_file else ""
+    
+    if efi_grub:
+        _add_ks(efi_grub, "linuxefi")
+
+    if isolinux_file:
+        _add_ks(isolinux_file, "append")
 
 def mount_by_loop_device(logger, imager, dest_dir, loop_device='auto'):
     is_auto = False
@@ -57,6 +82,7 @@ def edit_ks(config_options, iso, ks, output_file, loop_device):
         if not os.path.exists(ks_dir):
             logger.debug(f"{ks_dir} dose not exist in original ISO. Try to make it...")
             subprocess.run('mkdir -p ' + ks_dir, shell=True)
+            add_ks_para(temp_dir)
         subprocess.run('rm -rf ' + ks_dir + '/ks.cfg', shell=True)
         shutil.copy(ks, ks_dir)
 
