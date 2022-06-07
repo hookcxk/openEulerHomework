@@ -148,6 +148,7 @@ def build(build_type, config_file, package_list, repo_files, product, version, r
     signal.signal(signal.SIGINT, omni_interrupt_handler)
     start_time = time.time()
     config_options = utils.parse_config_file(config_file)
+    isolabel = "%s-%s%s-%s"%(product, version, release, os.uname().machine)
     logger = LogUtils('logger', config_options)
     if build_type not in SUPPORTED_BUILDTYPE:
         logger.debug('Unsupported build-type, Stopped ...')
@@ -178,7 +179,7 @@ def build(build_type, config_file, package_list, repo_files, product, version, r
         os.makedirs(package_dir)
         pkg_fetcher.fetch_pkgs(package_dir, packages, rootfs_dir, verbose=True)
         subprocess.run('createrepo ' + package_dir, shell=True)
-        iso_worker.make_iso(lorax_iso_dir, rootfs_dir, output_file, skip_isolinux=True)
+        iso_worker.make_iso(lorax_iso_dir, rootfs_dir, output_file, isolabel, skip_isolinux=True)
     else:
         use_cached = config_options.get('use_cached_rootfs')
         if not use_cached:
@@ -201,7 +202,7 @@ def build(build_type, config_file, package_list, repo_files, product, version, r
             pkg_fetcher.fetch_pkgs(rpms_dir, user_specified_packages, rootfs_dir, verbose=True)
             subprocess.run('createrepo ' + rpms_dir, shell=True)
 
-        iso_worker.make_iso(iso_base, rootfs_dir, output_file)
+        iso_worker.make_iso(iso_base, rootfs_dir, output_file, isolabel)
     logger.debug(f'ISO: openEuler-test.iso generated in: {work_dir}')
     utils.create_checksum_file(config_options, work_dir, output_file)
     end_time = time.time()
