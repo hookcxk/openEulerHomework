@@ -119,7 +119,7 @@ If you don't know which packages are necessary for building minimal ISO, we sugg
 ```shell
 omni-imager build anaconda-iso --config-file /opt/omni-imager/etc/conf.ini \
 --repo-files /etc/omni-imager/repos/openEuler-22.03-LTS.repo --product ${product_name} \
---version ${version} --release ${release_name} --output-file ${output_name} \
+--version ${version} --release ${release_name} --variant ${variant} --output-file ${output_name} \
 --package-list ${package_list} 
 ```
 
