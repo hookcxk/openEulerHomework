@@ -13,6 +13,7 @@ from omniimager import installer_maker
 from omniimager import iso_worker
 from omniimager import pkg_fetcher
 from omniimager.log_utils import LogUtils
+from omniimager.utils import binary_exists
 
 ROOTFS_DIR = 'rootfs'
 DNF_COMMAND = 'dnf'
@@ -43,7 +44,6 @@ INITRD_PKG_LIST = [
     "sg3_utils", "dracut-config-generic", "dracut-network", "rdma-core",
     "selinux-policy-mls", "kernel"
 ]
-
 
 REQUIRED_BINARIES = ["createrepo", "dnf", "mkisofs", "lorax"]
 
@@ -103,10 +103,6 @@ def parse_package_list(list_file):
 def clean_up_dir(target_dir):
     if os.path.exists(target_dir):
         shutil.rmtree(target_dir)
-
-
-def binary_exists(name):
-    return False if shutil.which(name) is None else True
 
 
 def prepare_workspace(config_options, repo_files, logger):
