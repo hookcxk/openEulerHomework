@@ -136,8 +136,8 @@ Keyword Arguments:
 - --product: The product name of you OS.
 - --version: The version of this build.
 - --release: The release name of this build (e.g. LTS, dev)
-
-  in '{working_dir}/etc' and use it when building image. Separate by ',' when there are several repo files.
+- --variant: If a variant is passed to lorax it will select a system-release package that ends with the variant name.
+eg. Passing `--variant` workstation will select the `openEuler-release-workstation` package if it exists.
 - --output-file: The output image file name. If it's not specified, use default name: 'openEuler-image.iso'
 
 
@@ -158,8 +158,7 @@ Keyword Arguments:
 - --package-list: The list of packages that you want to put into your image.
 - --config-file: Configuration file for the software.
 - --repo-files: The list of repo files that you want to use, the program will consolidate them to a new repo file
-
-  in '[working_dir]/etc' and use it when building image. Separate by ',' when there are several repo files.
+in '[working_dir]/etc' and use it when building image. Separate by ',' when there are several repo files.
 - --output-file: The output image file name. If it's not specified, use default name: 'openEuler-image.iso'
 
 
