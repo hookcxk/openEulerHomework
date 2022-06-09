@@ -12,9 +12,10 @@ from omniimager import editor
 @click.option('--product', help='Product Name.')
 @click.option('--version', help='Version Identifier.')
 @click.option('--release', help='Release.')
+@click.option('--variant', help='Variant.')
 @click.option('--output-file', default='openEuler-image.iso', help='The output image file name.')
-def build(build_type, config_file, package_list, repo_files, product, version, release, output_file):
-    imager.build(build_type, config_file, package_list, repo_files, product, version, release, output_file)
+def build(build_type, config_file, package_list, repo_files, product, version, release, variant, output_file):
+    imager.build(build_type, config_file, package_list, repo_files, product, version, release, variant, output_file)
 
 
 @click.command()

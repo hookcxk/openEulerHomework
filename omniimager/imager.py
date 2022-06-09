@@ -6,6 +6,7 @@ import sys
 import time
 import shutil
 import signal
+import libcomps
 
 from omniimager import lorax
 from omniimager import rootfs_worker, utils
@@ -14,6 +15,7 @@ from omniimager import iso_worker
 from omniimager import pkg_fetcher
 from omniimager.log_utils import LogUtils
 from omniimager.utils import binary_exists
+from omniimager.ks_util import get_ksparser, get_packages
 
 ROOTFS_DIR = 'rootfs'
 DNF_COMMAND = 'dnf'
@@ -88,6 +90,17 @@ def parse_repo_files(save_path, repo_files_str):
     print('Make repo file successfully！')
     return filepath
 
+def parse_comps_packages(ks_file, comps_file):
+    ksparser = get_ksparser(ks_file)
+    comps = libcomps.Comps()
+    comps.fromxml_f(comps_file)
+
+    pkglist = []
+    for grp in ksparser.handler.packages.groupList:
+        pkglist += get_packages(comps, grp.name)
+ 
+    c_pkglist = list(set(pkglist))
+    return c_pkglist
 
 def parse_package_list(list_file):
     if not list_file:
@@ -140,7 +153,7 @@ def omni_interrupt_handler(signum, frame):
     sys.exit(1)
 
 
-def build(build_type, config_file, package_list, repo_files, product, version, release, output_file):
+def build(build_type, config_file, package_list, repo_files, product, version, release, variant, output_file):
     signal.signal(signal.SIGINT, omni_interrupt_handler)
     start_time = time.time()
     config_options = utils.parse_config_file(config_file)
@@ -169,12 +182,16 @@ def build(build_type, config_file, package_list, repo_files, product, version, r
         config_options, repo_files, logger)
 
     if build_type == TYPE_ANACONDA_INSTALLER:
+        ks_file = config_options['ks_file']
+        comps_file = config_options['comps_file']
+        comps_packages_list = parse_comps_packages(ks_file, comps_file)
+
         lorax_iso_dir = lorax.build_install_img(
-            work_dir, product, version, release, repo_file, config_options, logger)
+            work_dir, product, version, release, repo_file, config_options, logger, variant)
         package_dir = os.path.join(lorax_iso_dir, 'Packages')
         os.makedirs(package_dir)
-        pkg_fetcher.fetch_pkgs(package_dir, packages, rootfs_dir, verbose=True)
-        subprocess.run('createrepo ' + package_dir, shell=True)
+        pkg_fetcher.fetch_pkgs(package_dir, comps_packages_list, rootfs_dir, verbose=True)
+        subprocess.run('createrepo -d -g %s -o %s %s'%(comps_file, lorax_iso_dir, lorax_iso_dir), shell=True)
         iso_worker.make_iso(lorax_iso_dir, rootfs_dir, output_file, isolabel, skip_isolinux=True)
     else:
         use_cached = config_options.get('use_cached_rootfs')
