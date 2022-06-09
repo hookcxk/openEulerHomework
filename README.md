@@ -13,7 +13,7 @@ to [Develop Documentation](./docs/develop.md).
 - openEuler distro
 - General: `cpio` `gzip` `tar` `cifs-utils` `syslinux`
 - Python runtime: `Python 3.8+`
-- rpm packages: `dnf` `dnf-plugins-core` `genisoimage`
+- rpm packages: `dnf` `dnf-plugins-core` `genisoimage` `coreutils`
 - pypi packages: check `requirements.txt`
 
 ### Install：
@@ -70,8 +70,8 @@ log_level=DEBUG
 log_dir=/var/log/omni-imager
 
 # when build or edit a image successfully. the script will generate a image checksum file. The option will decide which 
-# algorithm to be used, if you don't config it, default: sha256sum.   
-checksum_type=sha256sum
+# algorithm to be used,now we support sha256, sha1, md5, sha224, sha384, sha512 if you don't config it, default: sha256.   
+checksum_algorithm=sha256
 
 [calamares]
 # customized username and password for generated image.
