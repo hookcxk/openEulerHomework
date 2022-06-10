@@ -8,10 +8,10 @@ import re
 
 from omniimager import utils
 from omniimager.log_utils import LogUtils
-from omniimager.utils import format_path
 
 EFI_GRUB_FILE="/EFI/BOOT/grub.cfg"
 LEGACY_GRUB_FILE="/isolinux/isolinux.cfg"
+
 
 def _add_ks(grub_file, kword):
     with open(grub_file, "r") as f:
@@ -22,10 +22,11 @@ def _add_ks(grub_file, kword):
         with open(grub_file, "w") as f1:
             f1.write(re_sub)
 
+
 def add_ks_para(work_dir):
     efi_grub = glob.glob(work_dir + EFI_GRUB_FILE)
     efi_grub = efi_grub[0] if efi_grub else ""
-    isolinux_file = file_glob_isolinux = glob.glob(work_dir + LEGACY_GRUB_FILE)
+    isolinux_file = glob.glob(work_dir + LEGACY_GRUB_FILE)
     isolinux_file = isolinux_file[0] if isolinux_file else ""
     
     if efi_grub:
@@ -33,6 +34,7 @@ def add_ks_para(work_dir):
 
     if isolinux_file:
         _add_ks(isolinux_file, "append")
+
 
 def mount_by_loop_device(logger, imager, dest_dir, loop_device='auto'):
     is_auto = False
@@ -64,17 +66,19 @@ def umount_loop_device(loop_device, dest_dir, is_auto=False):
     if is_auto:
         subprocess.run(f'rm -rf {loop_device}', shell=True)
 
-def read_iso_label(iso):
+
+def read_iso_label(iso, logger):
     label = "CD-ROM"
     result = subprocess.run('isoinfo -d -i' + iso,stdout=subprocess.PIPE,encoding="utf-8",shell=True)
     if result.returncode == 0:
         isoinfo = result.stdout
         pattern = re.compile('Volume id: +\S*')
         volume_id = pattern.search(isoinfo).group()
-        label = re.split(' +',volume_id)[2]
+        label = re.split(' +', volume_id)[2]
     else:
         logger.debug(f'The iso Volume id is invalid')
     return label
+
 
 def edit_ks(config_options, iso, ks, output_file, loop_device):
     logger = LogUtils('logger', config_options)
@@ -101,7 +105,7 @@ def edit_ks(config_options, iso, ks, output_file, loop_device):
         os.chdir(temp_dir)
         logger.debug('Initializing environment, please wait for a while... ')
         output_file_path = os.path.join(working_dir, output_file)
-        label = read_iso_label(iso)
+        label = read_iso_label(iso, logger)
         iso_cmd_prefix = f'mkisofs -R -J -T -r -l -d -V {label} -joliet-long -allow-multidot -allow-leading-dots -no-bak -o {output_file_path} -e images/efiboot.img -no-emul-boot '
         if os.uname().machine == 'x86_64':
             iso_cmd = iso_cmd_prefix + '-b isolinux/isolinux.bin -c isolinux/boot.cat -boot-load-size 4 ' \

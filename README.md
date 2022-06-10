@@ -137,7 +137,8 @@ Keyword Arguments:
 - --version: The version of this build.
 - --release: The release name of this build (e.g. LTS, dev)
 - --variant: If a variant is passed to lorax it will select a system-release package that ends with the variant name.
-eg. Passing `--variant` workstation will select the `openEuler-release-workstation` package if it exists.
+eg. Passing `--variant server` will select the `openEuler-release-server` package if it exists, the default value of
+this parameter is `server`.
 - --output-file: The output image file name. If it's not specified, use default name: 'openEuler-image.iso'
 
 
