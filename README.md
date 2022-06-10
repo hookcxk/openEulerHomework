@@ -13,7 +13,7 @@ to [Develop Documentation](./docs/develop.md).
 - openEuler distro
 - General: `cpio` `gzip` `tar` `cifs-utils` `syslinux`
 - Python runtime: `Python 3.8+`
-- rpm packages: `dnf` `dnf-plugins-core` `genisoimage` `coreutils`
+- rpm packages: `dnf` `dnf-plugins-core` `genisoimage` `coreutils` `libcomps`
 - pypi packages: check `requirements.txt`
 
 ### Install：
