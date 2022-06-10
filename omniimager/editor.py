@@ -64,6 +64,17 @@ def umount_loop_device(loop_device, dest_dir, is_auto=False):
     if is_auto:
         subprocess.run(f'rm -rf {loop_device}', shell=True)
 
+def read_iso_label(iso):
+    label = "CD-ROM"
+    result = subprocess.run('isoinfo -d -i' + iso,stdout=subprocess.PIPE,encoding="utf-8",shell=True)
+    if result.returncode == 0:
+        isoinfo = result.stdout
+        pattern = re.compile('Volume id: +\S*')
+        volume_id = pattern.search(isoinfo).group()
+        label = re.split(' +',volume_id)[2]
+    else:
+        logger.debug(f'The iso Volume id is invalid')
+    return label
 
 def edit_ks(config_options, iso, ks, output_file, loop_device):
     logger = LogUtils('logger', config_options)
@@ -90,7 +101,8 @@ def edit_ks(config_options, iso, ks, output_file, loop_device):
         os.chdir(temp_dir)
         logger.debug('Initializing environment, please wait for a while... ')
         output_file_path = os.path.join(working_dir, output_file)
-        iso_cmd_prefix = f'mkisofs -R -J -T -r -l -d -joliet-long -allow-multidot -allow-leading-dots -no-bak -o {output_file_path} -e images/efiboot.img -no-emul-boot '
+        label = read_iso_label(iso)
+        iso_cmd_prefix = f'mkisofs -R -J -T -r -l -d -V {label} -joliet-long -allow-multidot -allow-leading-dots -no-bak -o {output_file_path} -e images/efiboot.img -no-emul-boot '
         if os.uname().machine == 'x86_64':
             iso_cmd = iso_cmd_prefix + '-b isolinux/isolinux.bin -c isolinux/boot.cat -boot-load-size 4 ' \
                                        '-boot-info-table -eltorito-alt-boot ' + temp_dir
