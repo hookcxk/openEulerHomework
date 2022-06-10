@@ -3,7 +3,7 @@ import subprocess
 import shutil
 
 
-def build_install_img(workdir, product, version, release, repo_files, config_options, logger, variant='Server'):
+def build_install_img(workdir, product, version, release, repo_files, config_options, logger, variant):
     logger.debug('Create Anaconda installer image with Lorax ...')
     buildarch = '--buildarch=' + os.uname().machine
     iso_dir = workdir + '/iso'

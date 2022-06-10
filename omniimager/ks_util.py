@@ -73,3 +73,5 @@ def get_packages(comps, group):
     for grp in comps.groups:
         if grp.id == group:
             return [pkg.name for pkg in grp.packages]
+        else:
+            return []

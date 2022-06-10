@@ -90,6 +90,7 @@ def parse_repo_files(save_path, repo_files_str):
     print('Make repo file successfully！')
     return filepath
 
+
 def parse_comps_packages(ks_file, comps_file):
     ksparser = get_ksparser(ks_file)
     comps = libcomps.Comps()
@@ -101,6 +102,7 @@ def parse_comps_packages(ks_file, comps_file):
  
     c_pkglist = list(set(pkglist))
     return c_pkglist
+
 
 def parse_package_list(list_file):
     if not list_file:
@@ -185,6 +187,9 @@ def build(build_type, config_file, package_list, repo_files, product, version, r
         ks_file = config_options['ks_file']
         comps_file = config_options['comps_file']
         comps_packages_list = parse_comps_packages(ks_file, comps_file)
+
+        if not variant:
+            variant = 'Server'
 
         lorax_iso_dir = lorax.build_install_img(
             work_dir, product, version, release, repo_file, config_options, logger, variant)
