@@ -33,7 +33,6 @@ class KickstartParser(pykickstart.parser.KickstartParser):
 
         return packages, conditional_packages
 
-
     def get_excluded_packages(self, dnf_obj):
         excluded = set()
         excluded.update(self.handler.packages.excludedList)
